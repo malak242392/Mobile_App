@@ -2,12 +2,10 @@ import { ComponentRef, RefObject } from 'react';
 import { Text, TextInput, TextInputProps, View } from 'react-native';
 import { colors } from '@/shared/theme';
 
-// Instance type of a TextInput (has focus(), blur(), ...). Newer React Native types
-// don't let us use `TextInput` itself as the instance type.
+
 export type InputRef = ComponentRef<typeof TextInput>;
 
-// Label + input used by the Post Property and Advertiser Profile forms.
-// Red border when the field has the error; grey when it is not editable.
+
 type Props = TextInputProps & {
   label: string;
   hasError?: boolean;

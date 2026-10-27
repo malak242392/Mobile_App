@@ -1,16 +1,52 @@
-import { View, Text } from 'react-native';
+import { FlatList, Text, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
+import { usePropertyList } from '../usePropertyList';
+import { PropertyCard } from '../components/PropertyCard';
+import { FilterChips } from '../components/FilterChips';
 import { Button } from '@/shared/components/Button';
 
-// TODO (Member 1): User Home. The buttons below are only for testing navigation.
+const TYPES = [
+  { label: 'All', value: 'all' },
+  { label: 'Rent', value: 'rent' },
+  { label: 'Sale', value: 'buy' },
+];
+
 export default function HomeScreen() {
+  const { list, query, setQuery, listingType, setListingType, favouriteIds, toggleFavourite } = usePropertyList();
+
   return (
-    <View className="flex-1 justify-center gap-3 bg-bg p-6">
-      <Text className="text-center text-2xl font-bold text-primary">User Home</Text>
-      <Text className="mb-2 text-center text-muted">Coming soon</Text>
-      <Button title="For Rent" onPress={() => router.push('/rent')} />
-      <Button title="For Sale" onPress={() => router.push('/buy')} />
-      <Button title="View advertiser a1" onPress={() => router.push('/advertiser-profile/a1')} />
+    <View className="flex-1 bg-bg p-3">
+      <TextInput
+        placeholder="Search by title or area..."
+        value={query}
+        onChangeText={setQuery}
+        className="mb-3 rounded-xl border border-border bg-card px-4 py-3"
+      />
+
+      <FilterChips options={TYPES} selected={listingType} onSelect={setListingType} />
+
+      <View className="mb-3 flex-row gap-2">
+        <View className="flex-1">
+          <Button title="For Rent" onPress={() => router.push('/rent')} />
+        </View>
+        <View className="flex-1">
+          <Button title="For Sale" onPress={() => router.push('/buy')} />
+        </View>
+      </View>
+
+      <FlatList
+        data={list}
+        keyExtractor={(p) => p.id}
+        renderItem={({ item }) => (
+          <PropertyCard
+            property={item}
+            favourite={favouriteIds.includes(item.id)}
+            onToggle={() => toggleFavourite(item.id)}
+            onPress={() => router.push(`/advertiser-profile/${item.advertiserId}`)}
+          />
+        )}
+        ListEmptyComponent={<Text className="mt-10 text-center text-muted">No properties found.</Text>}
+      />
     </View>
   );
 }

@@ -1,11 +1,48 @@
-import { View, Text } from 'react-native';
+import { FlatList, Text, TextInput, View } from 'react-native';
+import { router } from 'expo-router';
+import { usePropertyList } from '../usePropertyList';
+import { PropertyCard } from '../components/PropertyCard';
+import { FilterChips } from '../components/FilterChips';
 
-// TODO (Member 1): build this screen. Spec + lab references are in the plan.
+const ROOMS = [
+  { label: 'Any', value: 'any' },
+  { label: '1', value: '1' },
+  { label: '2', value: '2' },
+  { label: '3+', value: '3' },
+];
+
 export default function RentScreen() {
+  const { list, query, setQuery, rooms, setRooms, favouriteIds, toggleFavourite } = usePropertyList('rent');
+
   return (
-    <View className="flex-1 items-center justify-center bg-bg">
-      <Text className="text-2xl font-bold text-primary">Properties for Rent</Text>
-      <Text className="mt-2 text-muted">Coming soon</Text>
+    <View className="flex-1 bg-bg p-3">
+      <TextInput
+        placeholder="Search rentals..."
+        value={query}
+        onChangeText={setQuery}
+        className="mb-3 rounded-xl border border-border bg-card px-4 py-3"
+      />
+
+      <Text className="mb-2 font-semibold text-text">Bedrooms</Text>
+      <FilterChips options={ROOMS} selected={rooms} onSelect={setRooms} />
+
+      <Text className="mb-2 text-muted">
+        {list.length} {list.length === 1 ? 'property' : 'properties'} for rent
+      </Text>
+
+      <FlatList
+        data={list}
+        keyExtractor={(p) => p.id}
+        renderItem={({ item }) => (
+          <PropertyCard
+            property={item}
+            favourite={favouriteIds.includes(item.id)}
+            onToggle={() => toggleFavourite(item.id)}
+            onPress={() => router.push(`/advertiser-profile/${item.advertiserId}`)}
+          />
+        )}
+        ListEmptyComponent={<Text className="mt-10 text-center text-muted">No rentals match your search.</Text>}
+      />
     </View>
   );
 }
